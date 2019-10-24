@@ -1,0 +1,125 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://player.gd" type="Script" id=1]
+[ext_resource path="res://sheet.png" type="Texture" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 7.0
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 2, 2 )
+
+[sub_resource type="Animation" id=3]
+resource_name = "Nouvelle animation"
+length = 0.5
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("spr_body:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4 ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "colli_off"
+length = 0.1
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("rotate_helper/Area2D/CollisionShape2D:shape:extents")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.05 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 9, 9 ), Vector2( 2, 2 ) ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "colli_on"
+length = 0.1
+step = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("rotate_helper/Area2D/CollisionShape2D:shape:extents")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.05 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 2, 2 ), Vector2( 9, 9 ) ]
+}
+
+[node name="player" type="KinematicBody2D"]
+collision_mask = 2
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="spr_body" type="Sprite" parent="."]
+modulate = Color( 1, 0.960784, 0, 1 )
+texture = ExtResource( 2 )
+vframes = 2
+hframes = 4
+frame = 4
+region_rect = Rect2( 0, 0, 32, 32 )
+
+[node name="coll" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+zoom = Vector2( 0.7, 0.7 )
+limit_left = -5000
+limit_top = -5000
+limit_right = 5000
+limit_bottom = 5000
+
+[node name="rotate_helper" type="Node2D" parent="."]
+
+[node name="Area2D" type="Area2D" parent="rotate_helper"]
+editor/display_folded = true
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="rotate_helper/Area2D"]
+shape = SubResource( 2 )
+
+[node name="laser" type="Line2D" parent="rotate_helper"]
+width = 1.0
+default_color = Color( 0.290196, 1, 0, 0.576471 )
+texture_mode = 1057425625
+
+[node name="ray_blok" type="RayCast2D" parent="rotate_helper"]
+enabled = true
+cast_to = Vector2( 20, 0 )
+collision_mask = 2
+
+[node name="ray_hook" type="RayCast2D" parent="rotate_helper"]
+enabled = true
+cast_to = Vector2( 200, 0 )
+collision_mask = 2
+
+[node name="arm" type="Sprite" parent="rotate_helper"]
+modulate = Color( 0.776471, 0.776471, 0.776471, 1 )
+position = Vector2( 3, 0 )
+texture = ExtResource( 2 )
+vframes = 2
+hframes = 4
+frame = 5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+"anims/Nouvelle animation" = SubResource( 3 )
+anims/colli_off = SubResource( 4 )
+anims/colli_on = SubResource( 5 )
+[connection signal="body_entered" from="rotate_helper/Area2D" to="." method="_on_Area2D_body_entered"]
